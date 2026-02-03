@@ -1,18 +1,13 @@
 FROM python:3.11-slim
 
-# Install LibreOffice, poppler-utils, and fonts
+# Install LibreOffice and poppler-utils
 RUN apt-get update && apt-get install -y \
     libreoffice \
     poppler-utils \
     fonts-liberation \
     fonts-dejavu \
-    fontconfig \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && fc-cache -f -v
-
-# Create a non-root user for LibreOffice
-RUN useradd -m -s /bin/bash appuser
+    && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
@@ -23,16 +18,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY main.py .
-
-# Create temp directory with proper permissions
-RUN mkdir -p /tmp/office && chown -R appuser:appuser /tmp/office
-
-# Set environment variables for LibreOffice
-ENV HOME=/tmp/office
-ENV TMPDIR=/tmp/office
-
-# Change to non-root user
-USER appuser
 
 # Expose port
 EXPOSE 8000
